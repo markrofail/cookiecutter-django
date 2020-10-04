@@ -1,0 +1,20 @@
+kind: pipeline
+type: docker
+name: default
+
+environment:
+  CELERY_BROKER_URL: redis://localhost:6379/0
+
+steps:
+- name: Test results
+  commands:
+  - pip install tox
+  - tox -e py38
+
+- name: backend
+  commands:
+  - tox -e black-template
+  - sh tests/test_docker.sh
+  - sh tests/test_docker.sh use_celery=y use_drf=y
+  - sh tests/test_bare.sh use_celery=y use_compressor=y
+
